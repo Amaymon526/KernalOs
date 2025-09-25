@@ -1,15 +1,17 @@
 #include "header/kernel.h"
+#include "/home/jeff/CLionProjects/KernalOs/driver/video/VGA/VgaDriver.hpp" // is richtig oarsch
+
 
 extern "C" void kernel_main() {
-    const char *msg = "Hello World from my kernel!";
-    char *vga = (char*)0xb8000;  // VGA Text Mode Speicher
-    int i = 0;
-    while (msg[i] != '\0') {
-        vga[i*2] = msg[i];      // Zeichen
-        vga[i*2+1] = 0x07;      // Farbe (hellgrau auf schwarz)
-        i++;
-    }
+    vga_driver::VgaDriver vga;
 
-    // CPU anhalten
+
+  	vga.putChar(1, 0, 'H', 0x0F);
+
+    vga.printString(2, 0, "Hello_ World!", 0x02);
+
+    while (1) {
+        asm("hlt");
+    }
     while (1) { asm("hlt"); }
 }
