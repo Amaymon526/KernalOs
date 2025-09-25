@@ -54,7 +54,7 @@ If you want to run QEMU on Windows natively, download:
 Clone the project:
 ```bash
 git clone https://github.com/<your-username>/KernalOs.git
-cd KernalOs/kernal
+cd KernalOs/kernel
 ```
 Build the kernel:
 ```bash
