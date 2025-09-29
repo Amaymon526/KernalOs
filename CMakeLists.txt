@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Verzeichnisse
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/kernel/src)
 set(DRIVER_DIR ${CMAKE_SOURCE_DIR}/driver/video/VGA)
+set(KEYBOARD_DIR ${CMAKE_SOURCE_DIR}/driver/input/Keyboard)   # <— NEU
 set(BUILD_DIR ${CMAKE_BINARY_DIR})
 set(ISO_DIR ${BUILD_DIR}/iso)
 
@@ -43,6 +44,23 @@ add_custom_command(
         DEPENDS ${DRIVER_DIR}/VgaDriver.cpp
 )
 
+# --- NEU: Keyboard.cpp bauen und einlinken ---
+add_custom_command(
+        OUTPUT ${BUILD_DIR}/Keyboard.o
+        COMMAND ${CMAKE_CXX_COMPILER} -m32 -ffreestanding -fno-pic -O2 -Wall -Wextra -fno-exceptions -fno-rtti -nostdlib -c ${KEYBOARD_DIR}/keyboard.cpp -o ${BUILD_DIR}/Keyboard.o
+        DEPENDS ${KEYBOARD_DIR}/keyboard.cpp
+)
+list(APPEND KERNEL_OBJS ${BUILD_DIR}/Keyboard.o)
+
+# (Optional) IRQ1-Stub, falls vorhanden
+# set(KBD_STUB_OBJ ${BUILD_DIR}/isr_keyboard.o)
+# add_custom_command(
+#         OUTPUT ${KBD_STUB_OBJ}
+#         COMMAND nasm -f elf32 ${KEYBOARD_DIR}/isr_keyboard.asm -o ${KBD_STUB_OBJ}
+#         DEPENDS ${KEYBOARD_DIR}/isr_keyboard.asm
+# )
+# list(APPEND KERNEL_OBJS ${KBD_STUB_OBJ})
+
 # Linken → kernel.bin
 set(KERNEL_BIN ${BUILD_DIR}/kernel.bin)
 add_custom_command(
@@ -65,9 +83,6 @@ add_custom_command(
         COMMAND grub-mkrescue -o ${KERNEL_ISO} ${ISO_DIR}
         DEPENDS ${KERNEL_BIN}
 )
-
-
-
 add_custom_target(iso ALL DEPENDS ${KERNEL_ISO})
 
 # QEMU Run Target
